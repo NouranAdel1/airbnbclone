@@ -1,6 +1,10 @@
+import 'package:airbnbmc/screens/guesthomescreen.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart';  // For navigation to SignUpScreen
 import 'package:airbnbmc/screens/signupscreen.dart';
+import 'package:provider/provider.dart';
+
+import '../provider/userprovider.dart'; // Import SignUpScreen
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,9 +24,9 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.white,  // Set background color of the Scaffold to white
       body: Center(  // Center everything inside the body of the screen
         child: ListView(
-          padding: EdgeInsets.all(20),  // Padding around the ListView
+          padding: const EdgeInsets.all(20),  // Padding around the ListView
           children: [
-            SizedBox(height: 50),  // Adds space at the top
+            const SizedBox(height: 50),  // Adds space at the top
             // Image positioned at the top
             Center(  // Ensures the image is centered horizontally
               child: Image.asset(
@@ -31,9 +35,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 100, // Ensures the logo is not too big
               ),
             ),
-            SizedBox(height: 20),  // Adds space between the image and text
+            const SizedBox(height: 20),  // Adds space between the image and text
             // Text positioned below the image
-            Text(
+            const Text(
               'Welcome to Airbnb',
               style: TextStyle(
                 fontWeight: FontWeight.bold,   // Bold text
@@ -43,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               textAlign: TextAlign.center,    // Centers the text horizontally
             ),
-            SizedBox(height: 40),  // Adds space between text and form fields
+            const SizedBox(height: 40),  // Adds space between text and form fields
             // Email input field
             TextField(
               controller: emailController,  // To access the email input value
@@ -60,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               keyboardType: TextInputType.emailAddress,  // Ensures email keyboard on mobile
             ),
-            SizedBox(height: 20),  // Adds space between email and password fields
+            const SizedBox(height: 20),  // Adds space between email and password fields
             // Password input field
             TextField(
               controller: passwordController,  // To access the password input value
@@ -77,35 +81,32 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               obscureText: true,  // Hides the password text
             ),
-            SizedBox(height: 30),  // Adds space between password field and login button
+            const SizedBox(height: 30),  // Adds space between password field and login button
             // Login button
             ElevatedButton(
               onPressed: () {
-                // Add login logic here
-                String email = emailController.text;
-                String password = passwordController.text;
-                // You can now use the email and password for authentication
-                print("Email: $email, Password: $password");
+                _signIn();
               },
-              child: Text(
+              child: const Text(
                 'Login',
                 style: TextStyle(color: Colors.white),  // White text color for the Login button
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,  // Button color
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 50),  // Button padding
-                textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),  // Button text style
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 50),  // Button padding
+                textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),  // Button text style
               ),
             ),
-            SizedBox(height: 20),  // Adds space between login button and the Sign Up message
-            // Sign Up message in red
+            const SizedBox(height: 20),  // Adds space between login button and the Sign Up message
+
+            // Message to navigate to Sign Up screen
             Center(
               child: TextButton(
                 onPressed: () {
-                  // Navigate to Sign Up screen using GetX
-                  Get.to(() => SignUpScreen()); // Use Get.to() to navigate
+                  // Navigate to Sign Up screen
+                  Get.to(() => const SignUpScreen());
                 },
-                child: Text(
+                child: const Text(
                   'Don\'t have an account? Sign Up',
                   style: TextStyle(
                     color: Colors.red,  // Red text color for the Sign Up message
@@ -118,6 +119,18 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+  Future<void> _signIn() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    try {
+      await userProvider.signIn(emailController.text, passwordController.text);
+      Get.off(GuestHomeScreen());
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
   }
 }
 
